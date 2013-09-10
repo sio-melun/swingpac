@@ -23,11 +23,12 @@ public class FenetreMain extends JFrame implements ActionListener {
   // une constante (mot clé final)
   // c'est un moyen très pratique d'associer un écouteur d'événement
   // à un générateur d'événement.
+	
   static final String ACTION_QUITTER = "Quitter";
-
   static final String ACTION_GO = "Go";
-  
   static final String ACTION_STOP = "Stop";
+  
+  
 
   private static final String PACKAGE_BIDULES = "org.ldv.melun.sio.swingpac.etudiants";
   private static final int TAILLE_BIDULE = 30;
@@ -136,7 +137,6 @@ public class FenetreMain extends JFrame implements ActionListener {
   }
 
   private void stop(){
-	  
   }
   
   /**
