@@ -1,8 +1,10 @@
 package org.ldv.melun.sio.swingpac;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +29,7 @@ public class FenetreMain extends JFrame implements ActionListener {
   static final String ACTION_QUITTER = "Quitter";
   static final String ACTION_GO = "Go";
   static final String ACTION_STOP = "Stop";
+  static final String ACTION_RESTART = "Restart";
   
   
 
@@ -82,15 +85,18 @@ public class FenetreMain extends JFrame implements ActionListener {
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mn.addActionListener(this);
     
-    JMenuItem mn1 = new JMenuItem("stop", KeyEvent.VK_G);
-    mn1.setActionCommand(ACTION_STOP);
-    mn1.addActionListener(this);
+    JMenuItem bouton_stop = new JMenuItem("stop", KeyEvent.VK_G);
+    bouton_stop.setActionCommand(ACTION_STOP);
+    bouton_stop.addActionListener(this);
+    
+    JMenuItem bouton_restart = new JMenuItem("restart", KeyEvent.VK_G);
+    bouton_restart.setActionCommand(ACTION_RESTART);
+    bouton_restart.addActionListener(this);
     
     jeu.add(mn);
-    jeu.add(mn1);
+    jeu.add(bouton_stop);
+    jeu.add(bouton_restart);
     menuBar.add(jeu);
-    // TODO : ajouter une commande Pause qui stoppe le timer de tous les objets
-    // Bidule.
 
 
     // on ajoute la barre de menu à la fenêtre
@@ -137,6 +143,27 @@ public class FenetreMain extends JFrame implements ActionListener {
   }
 
   private void stop(){
+	  List<Bidule> bidulesPresent = new ArrayList<Bidule>();
+	  for (Component obj: this.getContentPane().getComponents()){
+		  if (obj instanceof Bidule && obj != this){
+			  bidulesPresent.add((Bidule) obj);
+		  }
+	  }
+	  for (Bidule bidules : bidulesPresent){
+		  bidules.stop();
+	  }
+  }
+
+  private void restart(){
+	  List<Bidule> bidulesPresent = new ArrayList<Bidule>();
+	  for (Component obj: this.getContentPane().getComponents()){
+		  if (obj instanceof Bidule && obj != this){
+			  bidulesPresent.add((Bidule) obj);
+		  }
+	  }
+	  for (Bidule bidules : bidulesPresent){
+		  bidules.start();
+	  }
   }
   
   /**
@@ -149,8 +176,11 @@ public class FenetreMain extends JFrame implements ActionListener {
       System.exit(0);
     } else if (action.equals(ACTION_GO)) {
       go();
-    }else if (action.equals(ACTION_STOP))
+    }else if (action.equals(ACTION_STOP)){
     	stop();
+    } else if (action.equals(ACTION_RESTART)){
+    	restart();
+    }
   }
 
 }// FentreMain

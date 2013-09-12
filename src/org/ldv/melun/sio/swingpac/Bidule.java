@@ -22,7 +22,7 @@ import javax.swing.Timer;
  *         TODO: mémoriser le nombre d'impacts d'objet bidules réalisés (pas
  *         subis)
  *         
- *         TODO : reféfinir toString afin de remonter des informations pertinentes 
+ *         TODO : redéfinir toString afin de remonter des informations pertinentes 
  * 
  *         TODO (plus difficile) : charger des images dans un tableau et
  *         appliquer la bonne image (dans paintComponent) en fonction de la
