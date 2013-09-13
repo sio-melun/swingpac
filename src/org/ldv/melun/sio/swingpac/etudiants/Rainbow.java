@@ -1,4 +1,4 @@
-package org.ldv.melun.sio.swingpac.createMe;
+package org.ldv.melun.sio.swingpac.etudiants;
 
 import java.awt.Color;
 
