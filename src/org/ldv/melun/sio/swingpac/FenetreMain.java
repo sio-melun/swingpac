@@ -106,7 +106,6 @@ public class FenetreMain extends JFrame implements ActionListener {
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mnItemQuitter.addActionListener(this);
 
-    
     Dimension tailleEcran = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
     int hauteur = (int)tailleEcran.getHeight();
     int largeur = (int)tailleEcran.getWidth();
@@ -142,6 +141,7 @@ public class FenetreMain extends JFrame implements ActionListener {
 
         // ajout l'objet à la fenêtre
         this.add(bidule);
+        System.out.println(bidule.toString());
       } catch (Exception e) {
         erreurs = e.getMessage();
       }
