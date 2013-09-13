@@ -1,6 +1,7 @@
 package org.ldv.melun.sio.swingpac;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -80,22 +81,22 @@ public class FenetreMain extends JFrame implements ActionListener {
     menuBar.add(menuFichier);
     JMenu jeu = new JMenu("Jeu");
     jeu.setMnemonic(KeyEvent.VK_J);
-    JMenuItem mn = new JMenuItem("go", KeyEvent.VK_G);
-    mn.setActionCommand(ACTION_GO);
+    JMenuItem bouton_go = new JMenuItem("go", KeyEvent.VK_G);
+    bouton_go.setActionCommand(ACTION_GO);
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
-    mn.addActionListener(this);
+    bouton_go.addActionListener(this);
+    jeu.add(bouton_go);
     
-    JMenuItem bouton_stop = new JMenuItem("stop", KeyEvent.VK_G);
+    JMenuItem bouton_stop = new JMenuItem("stop", KeyEvent.VK_S);
     bouton_stop.setActionCommand(ACTION_STOP);
     bouton_stop.addActionListener(this);
+    jeu.add(bouton_stop);
     
-    JMenuItem bouton_restart = new JMenuItem("restart", KeyEvent.VK_G);
+    JMenuItem bouton_restart = new JMenuItem("restart", KeyEvent.VK_R);
     bouton_restart.setActionCommand(ACTION_RESTART);
     bouton_restart.addActionListener(this);
-    
-    jeu.add(mn);
-    jeu.add(bouton_stop);
     jeu.add(bouton_restart);
+    
     menuBar.add(jeu);
 
 
@@ -105,9 +106,16 @@ public class FenetreMain extends JFrame implements ActionListener {
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mnItemQuitter.addActionListener(this);
 
-    // TODO : définir une taille en fonction de la taille de l'écran
-    // par exemple le 1/4 de l'écran pour des grands écrans, ou 1/2 ...
-    setSize(500, 500);
+    
+    Dimension tailleEcran = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+    int hauteur = (int)tailleEcran.getHeight();
+    int largeur = (int)tailleEcran.getWidth();
+    if (largeur>1500){
+    	setSize(largeur/4, hauteur/4);
+    }
+    else {
+    	setSize(largeur/3, hauteur/3);
+    }
 
   }
 

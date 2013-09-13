@@ -15,8 +15,6 @@ public class Rainbow  extends Bidule {
 	    setBackground(Color.CYAN);
 	  }
 	  
-
-	  
 	  @Override
 	  public void doMove() {
 	    super.doMove();
@@ -29,6 +27,11 @@ public class Rainbow  extends Bidule {
 	      goOnTop();
 
 	  }
+	  
+	  public void tuEstouchePar(Bidule biduleImpacteur) {
+
+		    doAfterImpactByOther();
+		  }
 
 	  
 	  

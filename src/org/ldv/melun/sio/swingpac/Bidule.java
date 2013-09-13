@@ -59,9 +59,9 @@ public class Bidule extends JPanel {
     alea = new Random();
   }
 
-  final int DELAYMAX = 10;
+  final int DELAYMAX = 30;
 
-  final int DELAYMIN = 5;
+  final int DELAYMIN = 25;
 
   final int DELAY;
 
