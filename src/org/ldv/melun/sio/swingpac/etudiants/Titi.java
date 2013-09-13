@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import org.ldv.melun.sio.swingpac.Bidule;
 
+@SuppressWarnings("serial")
 public class Titi extends Bidule {
 
   private int nbDeplacements;
@@ -25,5 +26,6 @@ public class Titi extends Bidule {
       else
         goOnLeft();
   }
+  
 
 }

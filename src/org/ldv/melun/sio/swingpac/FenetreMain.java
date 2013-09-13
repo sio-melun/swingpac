@@ -1,5 +1,6 @@
 package org.ldv.melun.sio.swingpac;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,7 +17,8 @@ import javax.swing.JOptionPane;
 import org.ldv.melun.sio.swingpac.utils.PackageUtil;
 
 /**
- * Définition de la scene du jeu et instanciation des objets. 
+ * Définition de la scene du jeu et instanciation des objets.
+ * 
  * @author lycée Léonard de Vinci - Melun - SIO-SLAM
  */
 public class FenetreMain extends JFrame implements ActionListener {
@@ -29,7 +31,9 @@ public class FenetreMain extends JFrame implements ActionListener {
 
   private static final String PACKAGE_BIDULES = "org.ldv.melun.sio.swingpac.etudiants";
 
-  private static final int TAILLE_BIDULE = 30;
+  private static final int TAILLE_BIDULE = 20;
+
+  private final String ACTION_PAUSE = "Pause";
 
   // constructeur
   public FenetreMain() {
@@ -80,6 +84,13 @@ public class FenetreMain extends JFrame implements ActionListener {
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mn.addActionListener(this);
     jeu.add(mn);
+
+    mn = new JMenuItem("pause", KeyEvent.VK_P);
+    mn.setActionCommand(ACTION_PAUSE);
+    // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
+    mn.addActionListener(this);
+    jeu.add(mn);
+
     menuBar.add(jeu);
 
     // TODO : ajouter une commande Pause qui stoppe le timer de tous les objets
@@ -104,11 +115,11 @@ public class FenetreMain extends JFrame implements ActionListener {
     // récupère la liste des classes du package en question
     String[] classes = PackageUtil.getClasses(PACKAGE_BIDULES);
     List<String> classesShuffles = Arrays.asList(classes);
-    
+
     // change l'ordre des éléments dans le tableau
     Collections.shuffle(classesShuffles);
     System.out.println(classesShuffles);
-    
+
     // on instancie les classes (un objet par class)
     // et l'ajoute à la scene (fenetre)
     String erreurs = "";
@@ -138,6 +149,19 @@ public class FenetreMain extends JFrame implements ActionListener {
       System.exit(0);
     } else if (action.equals(ACTION_GO)) {
       go();
+    } else if (action.equals(ACTION_PAUSE)) {
+      pause();
+    }
+
+  }
+
+  private void pause() {
+    System.out.println("nb compos : " +this.getContentPane().getComponentCount());
+    for (Component obj : this.getContentPane().getComponents()) {
+      if (obj instanceof Bidule) {
+        Bidule b = (Bidule) obj;
+        b.stop();
+      }
     }
   }
 
