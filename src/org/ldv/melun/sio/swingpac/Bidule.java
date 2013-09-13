@@ -38,6 +38,13 @@ public class Bidule extends JPanel {
 	 * valeur de déplacement en X, Y
 	 */
 	private int incY, incX;
+	
+	/**
+	 * Nombre de collisions
+	 */
+	
+	private int nbCollision;
+
 
 	/**
 	 * nom de l'instance (TODO : pourrait être pris par défaut via
@@ -101,6 +108,7 @@ public class Bidule extends JPanel {
 		this.setBackground(Color.BLUE);
 		this.incX = 1;
 		this.incY = 1;
+	    this.nbCollision=0;
 
 		// demande d'une vitesse de déplacement (d'appel du timer)
 		// comprise entre DELAYMAX et DELAYMIN
@@ -173,6 +181,14 @@ public class Bidule extends JPanel {
 			this.incX = 0; // punition !
 	}
 
+	public int getNbCollision() {
+		return nbCollision;
+	}
+
+	public void collisionPlusUn() {
+		this.nbCollision = this.getNbCollision()+1;
+	}
+
 	/**
 	 * appelé après un déplacement. Vérifie si impacts, et préviens les objets
 	 * touchés.
@@ -204,7 +220,8 @@ public class Bidule extends JPanel {
 		// le vainqueur est celui qui reste seul
 		if (aloneInTheWorld()) {
 			timer.stop();
-			JOptionPane.showMessageDialog(getParent(), "GAGNÉ : " + name);
+			JOptionPane.showMessageDialog(getParent(), "GAGNÉ : " + name + ""
+					+ "Nombre collision = " + nbCollision);
 			getParent().remove(this);
 		}
 	}
@@ -247,7 +264,8 @@ public class Bidule extends JPanel {
 			System.out.println("Je meurs :-(   " + this.name);
 			getParent().remove(this);
 		}
-
+		
+		collisionPlusUn();
 		doAfterImpactByOther();
 	}
 
