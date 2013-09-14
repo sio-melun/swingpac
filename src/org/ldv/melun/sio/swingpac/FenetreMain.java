@@ -1,5 +1,6 @@
 package org.ldv.melun.sio.swingpac;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,9 +32,11 @@ public class FenetreMain extends JFrame implements ActionListener {
 
   private static final String PACKAGE_BIDULES = "org.ldv.melun.sio.swingpac.etudiants";
 
-  private static final int TAILLE_BIDULE = 20;
+  private static final int TAILLE_BIDULE = 50;
 
   private final String ACTION_PAUSE = "Pause";
+
+  private JMenuItem mnPause;
 
   // constructeur
   public FenetreMain() {
@@ -85,11 +88,11 @@ public class FenetreMain extends JFrame implements ActionListener {
     mn.addActionListener(this);
     jeu.add(mn);
 
-    mn = new JMenuItem("pause", KeyEvent.VK_P);
-    mn.setActionCommand(ACTION_PAUSE);
+    mnPause = new JMenuItem("Start", KeyEvent.VK_P);
+    mnPause.setActionCommand(ACTION_PAUSE);
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
-    mn.addActionListener(this);
-    jeu.add(mn);
+    mnPause.addActionListener(this);
+    jeu.add(mnPause);
 
     menuBar.add(jeu);
 
@@ -102,10 +105,11 @@ public class FenetreMain extends JFrame implements ActionListener {
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mnItemQuitter.addActionListener(this);
 
+    getContentPane().setBackground(Color.WHITE);
+
     // TODO : définir une taille en fonction de la taille de l'écran
     // par exemple le 1/4 de l'écran pour des grands écrans, ou 1/2 ...
     setSize(500, 500);
-
   }
 
   /**
@@ -123,11 +127,32 @@ public class FenetreMain extends JFrame implements ActionListener {
     // on instancie les classes (un objet par class)
     // et l'ajoute à la scene (fenetre)
     String erreurs = "";
+
+    int margeBidule = 4;
+    int largeurCadreBidulle = TAILLE_BIDULE + margeBidule;
+
+    // mettre les bidules dans le cadre en tentant d'éviter les
+    // chevauchements...
+    int xDansScene = 0;
+    int yDansScene = 0;
+    System.out.println(getWidth());
+
     for (int i = 0; i < classesShuffles.size(); i++) {
       try {
         Bidule bidule = (Bidule) Class.forName(
             PACKAGE_BIDULES + "." + classesShuffles.get(i)).newInstance();
-        bidule.setLocation(20 + i * TAILLE_BIDULE, +i * TAILLE_BIDULE);
+
+        bidule.stop();
+
+        if (xDansScene + TAILLE_BIDULE > getWidth()) {
+          xDansScene = 0;
+          yDansScene += largeurCadreBidulle;
+        }
+
+        bidule.setLocation(xDansScene, yDansScene);
+        // bidule.setLocation(20 + i * TAILLE_BIDULE, +i * TAILLE_BIDULE);
+
+        xDansScene += largeurCadreBidulle;
 
         // ajout l'objet à la fenêtre
         this.add(bidule);
@@ -135,6 +160,8 @@ public class FenetreMain extends JFrame implements ActionListener {
         erreurs = e.getMessage();
       }
     }
+    this.getContentPane().invalidate();
+    this.repaint();
     if (!"".equals(erreurs))
       JOptionPane.showMessageDialog(null, erreurs);
   }
@@ -152,16 +179,27 @@ public class FenetreMain extends JFrame implements ActionListener {
     } else if (action.equals(ACTION_PAUSE)) {
       pause();
     }
-
   }
 
   private void pause() {
-    System.out.println("nb compos : " +this.getContentPane().getComponentCount());
+    System.out.println("nb compos : "
+        + this.getContentPane().getComponentCount());
+    Bidule b = null;
     for (Component obj : this.getContentPane().getComponents()) {
       if (obj instanceof Bidule) {
-        Bidule b = (Bidule) obj;
-        b.stop();
+        b = (Bidule) obj;
+        if (b.isRunning()) {
+          b.stop();
+        } else {
+          b.start();
+        }
       }
+    }
+    if (b != null) {
+      if (b.isRunning())
+        mnPause.setText("Stop");
+      else
+        mnPause.setText("Start");
     }
   }
 

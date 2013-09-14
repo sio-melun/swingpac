@@ -107,7 +107,7 @@ public class Bidule extends JPanel {
   public Bidule(String name) {
     super();
     this.name = name;
-    this.setSize(100, 100);
+    this.setSize(50, 50);
     this.setBackground(Color.BLUE);
     this.incX = 1;
     this.incY = 1;
@@ -391,5 +391,9 @@ public class Bidule extends JPanel {
       goOnTop();
     if (getY() + incY < 0)
       goOnDown();
+  }
+
+  public boolean isRunning() {
+    return timer.isRunning();
   }
 }
