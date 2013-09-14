@@ -30,7 +30,15 @@ import javax.swing.Timer;
  *         direction de déplacement (à la pacman)
  * 
  */
+@SuppressWarnings("serial")
 public class Bidule extends JPanel {
+
+  @Override
+  public String toString() {
+    return "Bidule [incY=" + incY + ", incX=" + incX + ", name=" + name
+        + ", DELAY=" + DELAY 
+        + ", nbTouches=" + nbTouches + "]";
+  }
 
   /**
    * Objet reponsable des déclenchement d'appels (voir MoveAction)
