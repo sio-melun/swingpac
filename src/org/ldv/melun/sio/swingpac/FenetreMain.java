@@ -3,13 +3,17 @@ package org.ldv.melun.sio.swingpac;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -30,7 +34,8 @@ import org.ldv.melun.sio.swingpac.utils.PackageUtil;
  * 
  * @author lycée Léonard de Vinci - Melun - SIO-SLAM
  */
-public class FenetreMain extends JFrame implements ActionListener, MouseListener {
+public class FenetreMain extends JFrame implements ActionListener,
+    MouseListener {
   // une constante (mot clé final)
   // c'est un moyen très pratique d'associer un écouteur d'événement
   // à un générateur d'événement.
@@ -45,9 +50,24 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
   private final String ACTION_PAUSE = "Pause";
 
   private JMenuItem mnPause;
-  
+
   private JPanel laScene;
+
   private JLabel infos;
+
+  /**
+   * pour stocker les bidules sortis de la scene lors d'une partie
+   */
+  private List<Bidule> deadBidules;
+
+  /**
+   * pour connaitre le score d'une classe de bidules au cours de plusieurs
+   * parties clé : le nom de la classe valeur : nombre de fois que la classe
+   * gangne une partie
+   */
+  private HashMap<String, Integer> winerClasseBidules;
+
+  private Bidule currentBidule;
 
   // constructeur
   public FenetreMain() {
@@ -55,23 +75,26 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
     super("SwingPac");
     // effet : donne un titre à la fenêtre
 
+    this.deadBidules = new ArrayList<Bidule>();
+    this.winerClasseBidules = new HashMap<String, Integer>();
+
     // l'application s'arrête lorsque cette fenêtre sera fermée.
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
- // pas de gestionnaire de positionnement
+    // pas de gestionnaire de positionnement
     setLayout(new BorderLayout());
-    
+
     laScene = new JPanel(true);
     // pas de gestionnaire de positionnement pour la sence
     laScene.setLayout(null);
-    
+
     infos = new JLabel();
     infos.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
     infos.setText("test");
 
     this.add(laScene, BorderLayout.CENTER);
     this.add(infos, BorderLayout.SOUTH);
-    
+
     // initialisation de la fenêtre
     init();
   }
@@ -156,15 +179,24 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
 
     // mettre les bidules dans le cadre en tentant d'éviter les
     // chevauchements...
-    int xDansScene = 0;
-    int yDansScene = 0;
+    int xDansScene = 2;
+    int yDansScene = 2;
     System.out.println(getWidth());
 
     for (int i = 0; i < classesShuffles.size(); i++) {
       try {
         Bidule bidule = (Bidule) Class.forName(
             PACKAGE_BIDULES + "." + classesShuffles.get(i)).newInstance();
+
+        // faut-il initialier le dictionnaire ?
+        if (!winerClasseBidules.containsKey(PACKAGE_BIDULES + "."
+            + classesShuffles.get(i)))
+          // oui
+          winerClasseBidules.put(
+              PACKAGE_BIDULES + "." + classesShuffles.get(i), 0);
+
         bidule.addMouseListener(this);
+
         bidule.stop();
 
         if (xDansScene + TAILLE_BIDULE > laScene.getWidth()) {
@@ -184,7 +216,7 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
     }
     if (!"".equals(erreurs))
       JOptionPane.showMessageDialog(null, erreurs);
-    
+
     this.getContentPane().invalidate();
     this.repaint();
 
@@ -206,8 +238,7 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
   }
 
   private void pause() {
-    System.out.println("nb compos : "
-        + this.laScene.getComponentCount());
+    System.out.println("nb compos : " + this.laScene.getComponentCount());
     Bidule b = null;
     for (Component obj : this.laScene.getComponents()) {
       if (obj instanceof Bidule) {
@@ -227,39 +258,62 @@ public class FenetreMain extends JFrame implements ActionListener, MouseListener
     }
   }
 
+  public void addDeadBidule(Bidule biduleQuiMeurt) {
+    deadBidules.add(biduleQuiMeurt);
+    infos.setText("Mort de " + biduleQuiMeurt.getName());
+    if (winerClasseBidules.size() - 1 == deadBidules.size()) {
+      // fin de la partie, il ne reste qu'un bidule dans la scene...
+      for (Component o : this.laScene.getComponents()) {
+        if (o instanceof Bidule && o != biduleQuiMeurt /*
+                                                        * il est encore dans la
+                                                        * scene a cet instant
+                                                        */)
+          infos.setText("GAGNE : " + o.toString());
+        deadBidules.clear();
+        // ajoute 1 à la classe concernée
+        winerClasseBidules.put(o.getClass().getName(),
+            winerClasseBidules.get(o.getClass().getName()) + 1);
+      }
+    }
+  }
+
+  // ///////////////////////////////////////// méthodes MouseMListener
   /**
    * Les bidules sont écoutés par this
    */
   @Override
   public void mouseClicked(MouseEvent e) {
-    JPanel bidule = (JPanel) e.getSource();
-    infos.setText(bidule.toString());
-    // ou, tout simplement :
-    //  infos.setText(e.getSource().toString());    
   }
 
   @Override
   public void mousePressed(MouseEvent e) {
     // TODO Auto-generated method stub
-    
   }
 
   @Override
   public void mouseReleased(MouseEvent e) {
     // TODO Auto-generated method stub
-    
   }
 
   @Override
   public void mouseEntered(MouseEvent e) {
-    // TODO Auto-generated method stub
-    
+    if (currentBidule != e.getSource()) {
+      currentBidule = (Bidule) e.getSource();
+      infos.setText(e.getSource().toString());
+      currentBidule.setSelected(true);
+      currentBidule.revalidate();
+      currentBidule.repaint();
+    }
   }
 
   @Override
   public void mouseExited(MouseEvent e) {
-    // TODO Auto-generated method stub
-    
+    if (currentBidule == null)
+      return;
+
+    currentBidule.setSelected(false);
+    currentBidule = null;
+    infos.setText(" ");
   }
 
 }// FentreMain
