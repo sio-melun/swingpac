@@ -13,8 +13,10 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -48,6 +50,8 @@ public class FenetreMain extends JFrame implements ActionListener,
   private final String ACTION_PAUSE = "Pause";
 
   private JMenuItem mnPause;
+  
+  private int nbParties;
 
   /**
    * lieu où se mouvent les bidules
@@ -200,7 +204,8 @@ public class FenetreMain extends JFrame implements ActionListener,
       try {
         Bidule bidule = (Bidule) Class.forName(
             PACKAGE_BIDULES + "." + classesShuffles.get(i)).newInstance();
-
+        bidule.stop();
+        
         // faut-il initialier le dictionnaire ?
         if (!winerClasseBidules.containsKey(PACKAGE_BIDULES + "."
             + classesShuffles.get(i)))
@@ -209,8 +214,6 @@ public class FenetreMain extends JFrame implements ActionListener,
               PACKAGE_BIDULES + "." + classesShuffles.get(i), 0);
 
         bidule.addMouseListener(this);
-
-        bidule.stop();
 
         if (xDansScene + Bidule.TAILLE_BIDULE > laScene.getWidth()) {
           xDansScene = 0;
@@ -229,7 +232,7 @@ public class FenetreMain extends JFrame implements ActionListener,
     }
     if (!"".equals(erreurs))
       JOptionPane.showMessageDialog(null, erreurs);
-
+    nbParties++;
     this.getContentPane().invalidate();
     this.repaint();
   }
@@ -244,11 +247,11 @@ public class FenetreMain extends JFrame implements ActionListener,
     } else if (action.equals(ACTION_GO)) {
       go();
     } else if (action.equals(ACTION_PAUSE)) {
-      pause();
+      startStopFlip();
     }
   }
 
-  private void pause() {
+  private void startStopFlip() {
     System.out.println("nb compos : " + this.laScene.getComponentCount());
     Bidule b = null;
     for (Component obj : this.laScene.getComponents()) {
@@ -271,22 +274,55 @@ public class FenetreMain extends JFrame implements ActionListener,
 
   public void addDeadBidule(Bidule biduleQuiMeurt) {
     deadBidules.add(biduleQuiMeurt);
+    laScene.remove(biduleQuiMeurt);
     infos.setText("Mort de " + biduleQuiMeurt.getName());
     if (winerClasseBidules.size() - 1 == deadBidules.size()) {
       // fin de la partie, il ne reste qu'un bidule dans la scene...
       for (Component o : this.laScene.getComponents()) {
-        if (o instanceof Bidule && o != biduleQuiMeurt) {
+        if (o instanceof Bidule) {
           // rem : biduleQuiMeurt est encore dans la scene a cet instant
           infos.setText("GAGNE : " + o.toString());
           deadBidules.clear();
+          laScene.remove(o);
           // ajoute 1 à la classe concernée
           winerClasseBidules.put(o.getClass().getName(),
               winerClasseBidules.get(o.getClass().getName()) + 1);
-          mnPause.setText("Start");
+          String winer = getWiner();
+          if (null == winer) {            
+            go(); // again
+            startStopFlip();
+          } else {
+            // fin, affiche le résultat
+            List<String> resultat = new ArrayList<String>();
+            for (String classe  : winerClasseBidules.keySet()) {
+              resultat.add(winerClasseBidules.get(classe) +" : " + classe);               
+            }
+            Collections.sort(resultat);
+            StringBuffer res = new StringBuffer();
+            for (int i = resultat.size() -1; i>= 0; i--) {
+              res.append(resultat.get(i)+"\n");
+            }
+            System.out.println("(nb parties = " + nbParties+") \nGAGNANT = " + winer+"\n"+res.toString());
+            System.out.println("CLASSE GAGNANTE : " + winer);
+            JOptionPane.showMessageDialog(null, "(nb parties = " + nbParties+") \nGAGNANT = " + winer+"\n"+res.toString());
+            infos.setText("CLASSE GAGNANTE : " + winer);
+          }
           break;
         }
       }
     }
+  }
+
+  /**
+   * Recherche la classe ayant obtenu 3 vainqueurs 
+   * @return le vainqueur ou null
+   */
+  private String getWiner() {
+    for (String classe  : winerClasseBidules.keySet()) {
+      if (winerClasseBidules.get(classe) == 3)
+        return classe;
+    }
+    return null;
   }
 
   // ///////////////////////////////////////// méthodes MouseMListener

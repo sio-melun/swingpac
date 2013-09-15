@@ -101,6 +101,9 @@ public class Bidule extends JPanel {
     @Override
     // traitement générique de la logique de déplacement
     public void actionPerformed(ActionEvent e) {
+      if (Bidule.this.getParent() == null)
+        return;
+      
       doMove();
       setLocation(getX() + incX, getY() + incY);
       stayOnStage();
@@ -136,7 +139,7 @@ public class Bidule extends JPanel {
     DELAY = alea.nextInt(DELAYMAX - DELAYMIN) + DELAYMIN;
 
     this.timer = new Timer(DELAY, new MoveAction());
-    this.start();
+    //this.start();
   }
 
   /**
@@ -223,7 +226,7 @@ public class Bidule extends JPanel {
     // le vainqueur est celui qui reste seul
     if (aloneInTheWorld()) {
       timer.stop();
-      JOptionPane.showMessageDialog(getParent(), "GAGNÉ : " + getName());
+      //JOptionPane.showMessageDialog(getParent(), "GAGNÉ : " + getName());
       getParent().remove(this);
     }
   }
@@ -269,8 +272,8 @@ public class Bidule extends JPanel {
         main.addDeadBidule(biduleQuiEstTouche);
       } catch (Exception e) {/* muet */
       }
-      System.out.println("Je meurs :-(   " + biduleQuiEstTouche.getName());
-      biduleQuiEstTouche.getParent().remove(this);
+//      System.out.println("Je meurs :-(   " + biduleQuiEstTouche.getName());
+      //biduleQuiEstTouche.getParent().remove(this);
     } else
       biduleQuiEstTouche.doAfterImpactByOther();
   }
