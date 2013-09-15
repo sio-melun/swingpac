@@ -45,8 +45,6 @@ public class FenetreMain extends JFrame implements ActionListener,
 
   private static final String PACKAGE_BIDULES = "org.ldv.melun.sio.swingpac.etudiants";
 
-  private static final int TAILLE_BIDULE = 50;
-
   private final String ACTION_PAUSE = "Pause";
 
   private JMenuItem mnPause;
@@ -175,7 +173,7 @@ public class FenetreMain extends JFrame implements ActionListener,
     String erreurs = "";
 
     int margeBidule = 4;
-    int largeurCadreBidulle = TAILLE_BIDULE + margeBidule;
+    int largeurCadreBidulle = Bidule.TAILLE_BIDULE + margeBidule;
 
     // mettre les bidules dans le cadre en tentant d'éviter les
     // chevauchements...
@@ -199,7 +197,7 @@ public class FenetreMain extends JFrame implements ActionListener,
 
         bidule.stop();
 
-        if (xDansScene + TAILLE_BIDULE > laScene.getWidth()) {
+        if (xDansScene + Bidule.TAILLE_BIDULE > laScene.getWidth()) {
           xDansScene = 0;
           yDansScene += largeurCadreBidulle;
         }
@@ -264,10 +262,8 @@ public class FenetreMain extends JFrame implements ActionListener,
     if (winerClasseBidules.size() - 1 == deadBidules.size()) {
       // fin de la partie, il ne reste qu'un bidule dans la scene...
       for (Component o : this.laScene.getComponents()) {
-        if (o instanceof Bidule && o != biduleQuiMeurt /*
-                                                        * il est encore dans la
-                                                        * scene a cet instant
-                                                        */)
+        if (o instanceof Bidule && o != biduleQuiMeurt)
+          // rem : biduleQuiMeurt est encore dans la scene a cet instant
           infos.setText("GAGNE : " + o.toString());
         deadBidules.clear();
         // ajoute 1 à la classe concernée
@@ -312,6 +308,8 @@ public class FenetreMain extends JFrame implements ActionListener,
       return;
 
     currentBidule.setSelected(false);
+    currentBidule.revalidate();
+    currentBidule.repaint();
     currentBidule = null;
     infos.setText(" ");
   }

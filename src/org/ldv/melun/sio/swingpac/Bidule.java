@@ -41,6 +41,11 @@ public class Bidule extends JPanel {
   }
 
   /**
+   * Taille initiale des bidules
+   */
+  public static final int TAILLE_BIDULE = 50;
+  
+  /**
    * Objet reponsable des déclenchement d'appels (voir MoveAction)
    */
   private Timer timer;
@@ -120,7 +125,7 @@ public class Bidule extends JPanel {
      */
     this.setName(name);
 
-    this.setSize(50, 50);
+    this.setSize(TAILLE_BIDULE, TAILLE_BIDULE);
     this.setBackground(Color.BLUE);
     this.incX = 1;
     this.incY = 1;
