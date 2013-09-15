@@ -15,7 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 /**
- * Modèle générique d'objet se déplacant dans la fenêtre (la scene)
+ * Modèle générique d'objet se déplacant dans une scene (son parent JPanel
+ * egalement)
  * 
  * @date 2013-09-09
  * @author kpu (lycée Léonard de Vinci - Melun - SIO-SLAM)
@@ -44,7 +45,7 @@ public class Bidule extends JPanel {
    * Taille initiale des bidules
    */
   public static final int TAILLE_BIDULE = 50;
-  
+
   /**
    * Objet reponsable des déclenchement d'appels (voir MoveAction)
    */
@@ -68,16 +69,15 @@ public class Bidule extends JPanel {
     alea = new Random();
   }
 
-  final int DELAYMAX = 10;
-
-  final int DELAYMIN = 5;
+  final int DELAYMAX = 12;
+  final int DELAYMIN = 6;
 
   final int DELAY;
 
   /**
    * dimension minimale considérant un bidule en vie
    */
-  final int NB_MINMAL_PIXELS_VIE = 3;
+  final int NB_MINMAL_PIXELS_VIE = 4;
 
   /**
    * Compte le nombre de fois que this touche un autre bidule, sans être touché
@@ -118,7 +118,7 @@ public class Bidule extends JPanel {
    */
   public Bidule(String name) {
     super();
-   
+
     /**
      * nom de l'instance (TODO : pourrait être pris par défaut (si non
      * renseigné) via getClass().getName()...)
@@ -193,24 +193,25 @@ public class Bidule extends JPanel {
 
   /**
    * appelé après un déplacement. Vérifie si impacts, et préviens les objets
-   * touchés.
+   * touchés. 
    */
   private void manageCollisions() {
     // ai-je touché d'autres bidules ?
     List<Bidule> bidules = this.getCollisions();
-    for (Bidule bidule : bidules) {
-      if (bidule.isGoDown()
-          && bidule.getY() + bidule.getHeight() >= this.getY())
-        this.tuEstouchePar(bidule);
-      else if (bidule.isGoUp()
-          && bidule.getY() <= this.getY() + this.getHeight())
-        this.tuEstouchePar(bidule);
-      else if (bidule.isGoRight()
-          && bidule.getX() + bidule.getWidth() >= this.getX())
-        this.tuEstouchePar(bidule);
-      else if (bidule.isGoLeft()
-          && bidule.getX() <= this.getWidth() + this.getX())
-        this.tuEstouchePar(bidule);
+    Bidule b1 = this;
+    for (Bidule b2 : bidules) {
+      if (b1.isGoRight() && b2.isGoRight()) {
+        b2.tuEstouchePar(this);
+      } else if (b1.isGoLeft() && b2.isGoLeft()) {
+        b2.tuEstouchePar(this);
+      } else if (b1.isGoUp() && b2.isGoUp()) {
+        b2.tuEstouchePar(this);
+      } else if (b1.isGoDown() && b2.isGoDown()) {
+        b2.tuEstouchePar(this);
+      } else { // collision frontale
+        b2.tuEstouchePar(b1);
+        b1.tuEstouchePar(b2);
+      }
     }
   }
 
@@ -251,12 +252,8 @@ public class Bidule extends JPanel {
     biduleQuiATouche.aTouche();
     Bidule biduleQuiEstTouche = this;
     // je retrécis
-    biduleQuiEstTouche.setBounds(getX() + incX, getY() + incY, getWidth() - 1,
+    biduleQuiEstTouche.setBounds(getX() , getY() , getWidth() - 1,
         getHeight() - 1);
-
-    // TODO (plus difficile) : augmenter la taille de biduleImpacteur (dans la
-    // limite du quart (un pourcentage) de la taille initiale)
-    // si celui-ci a touché au moins x autres bidules
 
     // en dessous d'une dimension minimale, l'objet
     // courant disparait de la scene...
@@ -425,7 +422,7 @@ public class Bidule extends JPanel {
   public void setSelected(boolean selected) {
     this.selected = selected;
   }
-  
+
   @Override
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);

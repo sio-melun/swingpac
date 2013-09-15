@@ -49,10 +49,17 @@ public class FenetreMain extends JFrame implements ActionListener,
 
   private JMenuItem mnPause;
 
+/**
+ * lieu où se mouvent les bidules 
+ */
   private JPanel laScene;
 
+  /**
+   * zone présentant des informations textuelles à l'utilisateur 
+   */
   private JLabel infos;
 
+  
   /**
    * pour stocker les bidules sortis de la scene lors d'une partie
    */
@@ -60,8 +67,8 @@ public class FenetreMain extends JFrame implements ActionListener,
 
   /**
    * pour connaitre le score d'une classe de bidules au cours de plusieurs
-   * parties clé : le nom de la classe valeur : nombre de fois que la classe
-   * gangne une partie
+   * parties, clé = le nom de la classe, valeur associée = nombre de fois que la classe
+   * à gagner une partie
    */
   private HashMap<String, Integer> winerClasseBidules;
 
@@ -162,8 +169,17 @@ public class FenetreMain extends JFrame implements ActionListener,
   private void go() {
     // récupère la liste des classes du package en question
     String[] classes = PackageUtil.getClasses(PACKAGE_BIDULES);
-    List<String> classesShuffles = Arrays.asList(classes);
+    
+    List<String> test = new ArrayList<String>();
+    for (int i = 0; i < classes.length; i++) {
+      test.add(classes[i]);  
+      test.add(classes[i]);
+      test.add(classes[i]);
+      test.add(classes[i]);
+    }
 
+    List<String> classesShuffles = test;//Arrays.asList(classes);
+    
     // change l'ordre des éléments dans le tableau
     Collections.shuffle(classesShuffles);
     System.out.println(classesShuffles);
@@ -269,6 +285,7 @@ public class FenetreMain extends JFrame implements ActionListener,
         // ajoute 1 à la classe concernée
         winerClasseBidules.put(o.getClass().getName(),
             winerClasseBidules.get(o.getClass().getName()) + 1);
+        mnPause.setText("Start");
       }
     }
   }
