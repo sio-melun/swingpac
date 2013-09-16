@@ -201,19 +201,19 @@ public class Bidule extends JPanel {
   private void manageCollisions() {
     // ai-je touché d'autres bidules ?
     List<Bidule> bidules = this.getCollisions();
-    Bidule b1 = this;
-    for (Bidule b2 : bidules) {
-      if (b1.isGoRight() && b2.isGoRight()) {
-        b2.tuEstouchePar(this);
-      } else if (b1.isGoLeft() && b2.isGoLeft()) {
-        b2.tuEstouchePar(this);
-      } else if (b1.isGoUp() && b2.isGoUp()) {
-        b2.tuEstouchePar(this);
-      } else if (b1.isGoDown() && b2.isGoDown()) {
-        b2.tuEstouchePar(this);
+    for (Bidule autreBidule : bidules) {
+      //if (b1.isGoRight() && b2.isGoRight()) {
+      if (this.isGoRight() && !autreBidule.isGoLeft()) {
+        autreBidule.tuEstouchePar(this);
+      } else if (this.isGoLeft() && !autreBidule.isGoRight()) {
+        autreBidule.tuEstouchePar(this);
+      } else if (this.isGoUp() && !autreBidule.isGoDown()) {
+        autreBidule.tuEstouchePar(this);
+      } else if (this.isGoDown() && !autreBidule.isGoUp()) {
+        autreBidule.tuEstouchePar(this);
       } else { // collision frontale
-        b2.tuEstouchePar(b1);
-        b1.tuEstouchePar(b2);
+        autreBidule.tuEstouchePar(this);
+        this.tuEstouchePar(autreBidule);
       }
     }
   }

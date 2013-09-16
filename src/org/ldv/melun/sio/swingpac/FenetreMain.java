@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.MenuItem;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,10 +48,12 @@ public class FenetreMain extends JFrame implements ActionListener,
 
   private static final String PACKAGE_BIDULES = "org.ldv.melun.sio.swingpac.etudiants";
 
+  private static final String ACTION_CHALLENGE = "Challenge";
+
   private final String ACTION_PAUSE = "Pause";
 
   private JMenuItem mnPause;
-  
+
   private int nbParties;
 
   /**
@@ -76,6 +79,8 @@ public class FenetreMain extends JFrame implements ActionListener,
   private HashMap<String, Integer> winerClasseBidules;
 
   private Bidule currentBidule;
+
+  private boolean challenge;
 
   // constructeur
   public FenetreMain() {
@@ -135,11 +140,19 @@ public class FenetreMain extends JFrame implements ActionListener,
     menuBar.add(menuFichier);
     JMenu jeu = new JMenu("Jeu");
     jeu.setMnemonic(KeyEvent.VK_J);
-    JMenuItem mn = new JMenuItem("go", KeyEvent.VK_G);
+    JMenuItem mn = new JMenuItem("Jouer une partie", KeyEvent.VK_G);
     mn.setActionCommand(ACTION_GO);
     // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
     mn.addActionListener(this);
     jeu.add(mn);
+
+    mn = new JMenuItem("Challenge", KeyEvent.VK_H);
+    mn.setActionCommand(ACTION_CHALLENGE);
+    // l'instance de cette fenêtre est à l'écoute d'une action sur ce menu
+    mn.addActionListener(this);
+    jeu.add(mn);
+
+    jeu.addSeparator();
 
     mnPause = new JMenuItem("Start/Stop", KeyEvent.VK_P);
     mnPause.setActionCommand(ACTION_PAUSE);
@@ -172,16 +185,16 @@ public class FenetreMain extends JFrame implements ActionListener,
   private void go() {
     // récupère la liste des classes du package en question
     String[] classes = PackageUtil.getClasses(PACKAGE_BIDULES);
-//
-//    List<String> test = new ArrayList<String>();
-//    for (int i = 0; i < classes.length; i++) {
-//      test.add(classes[i]);
-//      test.add(classes[i]);
-//      test.add(classes[i]);
-//      test.add(classes[i]);
-//    }
+    //
+    // List<String> test = new ArrayList<String>();
+    // for (int i = 0; i < classes.length; i++) {
+    // test.add(classes[i]);
+    // test.add(classes[i]);
+    // test.add(classes[i]);
+    // test.add(classes[i]);
+    // }
 
-    List<String> classesShuffles = /*test;*/ Arrays.asList(classes);
+    List<String> classesShuffles = /* test; */Arrays.asList(classes);
 
     // change l'ordre des éléments dans le tableau
     Collections.shuffle(classesShuffles);
@@ -198,14 +211,15 @@ public class FenetreMain extends JFrame implements ActionListener,
     // chevauchements...
     int xDansScene = 2;
     int yDansScene = 2;
-    System.out.println(getWidth());
+
+    System.out.println("Largeur de la fenêtre = " + getWidth());
 
     for (int i = 0; i < classesShuffles.size(); i++) {
       try {
         Bidule bidule = (Bidule) Class.forName(
             PACKAGE_BIDULES + "." + classesShuffles.get(i)).newInstance();
         bidule.stop();
-        
+
         // faut-il initialier le dictionnaire ?
         if (!winerClasseBidules.containsKey(PACKAGE_BIDULES + "."
             + classesShuffles.get(i)))
@@ -246,6 +260,9 @@ public class FenetreMain extends JFrame implements ActionListener,
       System.exit(0);
     } else if (action.equals(ACTION_GO)) {
       go();
+    } else if (action.equals(ACTION_CHALLENGE)) {
+      challenge = true;
+      go();
     } else if (action.equals(ACTION_PAUSE)) {
       startStopFlip();
     }
@@ -275,50 +292,60 @@ public class FenetreMain extends JFrame implements ActionListener,
   public void addDeadBidule(Bidule biduleQuiMeurt) {
     deadBidules.add(biduleQuiMeurt);
     laScene.remove(biduleQuiMeurt);
+    System.out.println("Mort de " + biduleQuiMeurt.getName());
     infos.setText("Mort de " + biduleQuiMeurt.getName());
     if (winerClasseBidules.size() - 1 == deadBidules.size()) {
       // fin de la partie, il ne reste qu'un bidule dans la scene...
       for (Component o : this.laScene.getComponents()) {
         if (o instanceof Bidule) {
-          // rem : biduleQuiMeurt est encore dans la scene a cet instant
           infos.setText("GAGNE : " + o.toString());
-          deadBidules.clear();
           laScene.remove(o);
-          // ajoute 1 à la classe concernée
-          winerClasseBidules.put(o.getClass().getName(),
-              winerClasseBidules.get(o.getClass().getName()) + 1);
-          String winer = getWiner();
-          if (null == winer) {            
-            go(); // again
-            startStopFlip();
+          deadBidules.clear();
+          mnPause.setText("Start");
+          if (!challenge) {
+            JOptionPane.showMessageDialog(null, "PARTIE GAGNÉE PAR : " + o.getName());
           } else {
-            // fin, affiche le résultat
-            List<String> resultat = new ArrayList<String>();
-            for (String classe  : winerClasseBidules.keySet()) {
-              resultat.add(winerClasseBidules.get(classe) +" : " + classe);               
+            deadBidules.clear();
+            // ajoute 1 à la classe concernée
+            winerClasseBidules.put(o.getClass().getName(),
+                winerClasseBidules.get(o.getClass().getName()) + 1);
+            String winer = getWiner();
+            if (null == winer) {
+              go(); // again
+              startStopFlip();
+            } else {
+              // fin, affiche le résultat
+              List<String> resultat = new ArrayList<String>();
+              for (String classe : winerClasseBidules.keySet()) {
+                resultat.add(winerClasseBidules.get(classe) + " : " + classe);
+              }
+              Collections.sort(resultat);
+              StringBuffer res = new StringBuffer();
+              for (int i = resultat.size() - 1; i >= 0; i--) {
+                res.append(resultat.get(i) + "\n");
+              }
+              System.out.println("(nb parties = " + nbParties
+                  + ") \nGAGNANT = " + winer + "\n" + res.toString());
+              System.out.println("challenge CLASSE GAGNANTE : " + winer);
+              JOptionPane.showMessageDialog(null, "(nb parties = " + nbParties
+                  + ") \nGAGNANT = " + winer + "\n" + res.toString());
+              infos.setText("CHALLENGE CLASSE GAGNANTE : " + winer);
+              challenge = false;
             }
-            Collections.sort(resultat);
-            StringBuffer res = new StringBuffer();
-            for (int i = resultat.size() -1; i>= 0; i--) {
-              res.append(resultat.get(i)+"\n");
-            }
-            System.out.println("(nb parties = " + nbParties+") \nGAGNANT = " + winer+"\n"+res.toString());
-            System.out.println("CLASSE GAGNANTE : " + winer);
-            JOptionPane.showMessageDialog(null, "(nb parties = " + nbParties+") \nGAGNANT = " + winer+"\n"+res.toString());
-            infos.setText("CLASSE GAGNANTE : " + winer);
+            break;
           }
-          break;
         }
       }
     }
   }
 
   /**
-   * Recherche la classe ayant obtenu 3 vainqueurs 
+   * Recherche la classe ayant obtenu 3 vainqueurs
+   * 
    * @return le vainqueur ou null
    */
   private String getWiner() {
-    for (String classe  : winerClasseBidules.keySet()) {
+    for (String classe : winerClasseBidules.keySet()) {
       if (winerClasseBidules.get(classe) == 3)
         return classe;
     }
