@@ -250,7 +250,7 @@ public class Bidule extends JPanel {
    * @param biduleQuiATouche
    *          l'objet qui vient de rentrer en collision avec moi
    */
-  public void tuEstouchePar(Bidule biduleQuiATouche) {
+  private void tuEstouchePar(Bidule biduleQuiATouche) {
     nbTouches = 0;
     biduleQuiATouche.aTouche();
     Bidule biduleQuiEstTouche = this;
