@@ -418,6 +418,9 @@ public class Bidule extends JPanel {
       goOnDown();
   }
 
+  
+  
+  
   public boolean isSelected() {
     return selected;
   }
@@ -440,5 +443,9 @@ public class Bidule extends JPanel {
 
   public boolean isRunning() {
     return timer.isRunning();
+  }
+
+  public int getDELAY() {
+    return DELAY;
   }
 }

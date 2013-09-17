@@ -90,6 +90,7 @@ public class FenetreMain extends JFrame implements ActionListener,
 
     this.deadBidules = new ArrayList<Bidule>();
     this.winerClasseBidules = new HashMap<String, Integer>();
+    this.nbParties = 0;
 
     // l'application s'arrête lorsque cette fenêtre sera fermée.
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -183,6 +184,7 @@ public class FenetreMain extends JFrame implements ActionListener,
    * Injecte des objets Bidule dans cette instance de fenêtre
    */
   private void go() {
+    nbParties++;
     // récupère la liste des classes du package en question
     String[] classes = PackageUtil.getClasses(PACKAGE_BIDULES);
     //
@@ -245,8 +247,7 @@ public class FenetreMain extends JFrame implements ActionListener,
       }
     }
     if (!"".equals(erreurs))
-      JOptionPane.showMessageDialog(null, erreurs);
-    nbParties++;
+      JOptionPane.showMessageDialog(null, erreurs);    
     this.getContentPane().invalidate();
     this.repaint();
   }
